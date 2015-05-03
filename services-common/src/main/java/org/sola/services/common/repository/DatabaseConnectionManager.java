@@ -159,7 +159,7 @@ public class DatabaseConnectionManager {
     public SqlSession getSqlSession() {
         return getSqlSessionFactory().openSession();
     }
-
+    
     public Class<? extends CommonMapper> getMapperClass() {
         return mapperClass;
     }

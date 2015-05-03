@@ -312,7 +312,8 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns list of available CRS
-     * @return 
+     *
+     * @return
      */
     @Override
     public List<Crs> getCrss() {
@@ -321,8 +322,9 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns CRS by provided srid
+     *
      * @param srid srid of CRS
-     * @return 
+     * @return
      */
     @Override
     public Crs getCrs(int srid) {
@@ -333,8 +335,9 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Saves provided CRS
+     *
      * @param crs CRS object to save
-     * @return 
+     * @return
      */
     @Override
     @RolesAllowed(RolesConstants.ADMIN_MANAGE_SETTINGS)
@@ -344,12 +347,13 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns list of layer queries
+     *
      * @param locale Locale code
-     * @return 
+     * @return
      */
     @Override
     public List<Query> getQueries(String locale) {
-        if(locale != null){
+        if (locale != null) {
             Map params = new HashMap<String, Object>();
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, locale);
             return getRepository().getEntityList(Query.class, params);
@@ -359,13 +363,14 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns layer query
+     *
      * @param name Query name
      * @param locale Locale code
-     * @return 
+     * @return
      */
     @Override
     public Query getQuery(String name, String locale) {
-        if(locale != null){
+        if (locale != null) {
             Map params = new HashMap<String, Object>();
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, locale);
             params.put(CommonSqlProvider.PARAM_WHERE_PART, "name='" + name + "'");
@@ -376,8 +381,9 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Saves layer query
+     *
      * @param query Query object to save
-     * @return 
+     * @return
      */
     @RolesAllowed(RolesConstants.ADMIN_MANAGE_SETTINGS)
     @Override
@@ -387,12 +393,13 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns list of map layers
+     *
      * @param locale Locale code
-     * @return 
+     * @return
      */
     @Override
     public List<ConfigMapLayer> getConfigMapLayers(String locale) {
-        if(locale != null){
+        if (locale != null) {
             Map params = new HashMap<String, Object>();
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, locale);
             return getRepository().getEntityList(ConfigMapLayer.class, params);
@@ -402,13 +409,14 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Returns map layer
+     *
      * @param name Layer name
      * @param locale Locale code
-     * @return 
+     * @return
      */
     @Override
     public ConfigMapLayer getConfigMapLayer(String name, String locale) {
-        if(locale != null){
+        if (locale != null) {
             Map params = new HashMap<String, Object>();
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, locale);
             params.put(CommonSqlProvider.PARAM_WHERE_PART, "name='" + name + "'");
@@ -419,12 +427,24 @@ public class SystemEJB extends AbstractEJB implements SystemEJBLocal {
 
     /**
      * Saves map layer
+     *
      * @param mapLayer Map layer to save
-     * @return 
+     * @return
      */
     @RolesAllowed(RolesConstants.ADMIN_MANAGE_SETTINGS)
     @Override
     public ConfigMapLayer saveConfigMapLayer(ConfigMapLayer mapLayer) {
         return getRepository().saveEntity(mapLayer);
+    }
+
+    /**
+     * @return Connected database info.
+     */
+    @RolesAllowed(RolesConstants.ADMIN_MANAGE_SETTINGS)
+    @Override
+    public DbInfo getDatabaseInfo() {
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_QUERY, DbInfo.QUERY);
+        return getRepository().getEntity(DbInfo.class, params);
     }
 }

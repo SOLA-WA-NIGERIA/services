@@ -34,6 +34,7 @@ import org.sola.services.ejb.system.repository.entities.Br;
 import org.sola.services.ejb.system.repository.entities.BrReport;
 import org.sola.services.ejb.system.repository.entities.ConfigMapLayer;
 import org.sola.services.ejb.system.repository.entities.Crs;
+import org.sola.services.ejb.system.repository.entities.DbInfo;
 import org.sola.services.ejb.system.repository.entities.EmailTask;
 import org.sola.services.ejb.system.repository.entities.Query;
 import org.sola.services.ejb.system.repository.entities.Setting;
@@ -156,4 +157,7 @@ public interface SystemEJBLocal extends AbstractEJBLocal {
     
     /** See {@link SystemEJB#saveConfigMapLayer(ConfigMapLayer mapLayer)}*/
     ConfigMapLayer saveConfigMapLayer(ConfigMapLayer mapLayer);
+    
+    /** See {@link SystemEJB#getDatabaseInfo()}*/
+    DbInfo getDatabaseInfo();
 }
