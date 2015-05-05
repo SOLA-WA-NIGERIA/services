@@ -73,8 +73,8 @@ public class RequestType extends AbstractCodeEntity {
     @ChildEntityList(parentIdField = "requestTypeCode")
     private List<RequestTypeRequiresSourceType> sourceTypeCodes;
     @Localized
-    @Column(name = "display_group_name")
-    private String displayGroupName;
+    @Column(name = "display_group_code")
+    private String displayGroupCode;
     @Column(name = "service_panel_code")
     private String servicePanelCode;
 
@@ -162,12 +162,12 @@ public class RequestType extends AbstractCodeEntity {
         this.sourceTypeCodes = sourceTypeCodes;
     }
 
-    public String getDisplayGroupName() {
-        return displayGroupName;
+    public String getDisplayGroupCode() {
+        return displayGroupCode;
     }
 
-    public void setDisplayGroupName(String displayGroupName) {
-        this.displayGroupName = displayGroupName;
+    public void setDisplayGroupCode(String displayGroupCode) {
+        this.displayGroupCode = displayGroupCode;
     }
 
     public String getServicePanelCode() {
