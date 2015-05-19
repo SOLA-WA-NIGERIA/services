@@ -27,8 +27,8 @@
  */
 package org.sola.services.ejbs.admin;
 
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.Language;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.UserGroup;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.Language;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.UserGroup;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.UserTransaction;
@@ -38,13 +38,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sola.services.common.EntityAction;
 import org.sola.services.common.test.AbstractEJBTest;
-import org.sola.services.ejbs.admin.businesslogic.AdminEJB;
-import org.sola.services.ejbs.admin.businesslogic.AdminEJBLocal;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.Role;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.User;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.Group;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.GroupRole;
-import org.sola.services.ejbs.admin.businesslogic.repository.entities.GroupSummary;
+import org.sola.admin.services.ejbs.admin.businesslogic.AdministratorEJB;
+import org.sola.admin.services.ejbs.admin.businesslogic.AdministratorEJBLocal;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.Role;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.User;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.Group;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.GroupRole;
+import org.sola.admin.services.ejbs.admin.businesslogic.repository.entities.GroupSummary;
 import static org.junit.Assert.*;
 
 public class AdminEJBIT extends AbstractEJBTest {
@@ -77,7 +77,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Loading all languages.");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<Language> result = instance.getLanguages(LANG);
             tx.commit();
@@ -99,7 +99,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Loading all roles");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<Role> result = instance.getRoles();
             tx.commit();
@@ -121,7 +121,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Loading roles for current user.");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<Role> result = instance.getCurrentUserRoles();
             tx.commit();
@@ -143,7 +143,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Checking if user has admin rights.");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             boolean result = instance.isUserAdmin();
             tx.commit();
@@ -168,7 +168,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Changing password");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             instance.changePassword("usr", "test");
             tx.commit();
@@ -186,7 +186,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Create group");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             // Get roles
             List<Role> roles = instance.getRoles();
@@ -235,7 +235,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Loading all groups");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<Group> result = instance.getGroups();
             tx.commit();
@@ -258,7 +258,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Loading all groups summary");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<GroupSummary> result = instance.getGroupsSummary();
             tx.commit();
@@ -281,7 +281,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Create new user.");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
 
             // Get group
@@ -346,7 +346,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Getting all users.");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             List<User> users = instance.getUsers();
             tx.commit();
@@ -368,7 +368,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Modifying group");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             // Get group
             Group group = instance.getGroup(GROUP_ID);
@@ -427,7 +427,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Deleting group");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             // Get group
             Group group = instance.getGroup(GROUP_ID);
@@ -459,7 +459,7 @@ public class AdminEJBIT extends AbstractEJBTest {
         System.out.println(">>> Deleting user");
         UserTransaction tx = getUserTransaction();
         try {
-            AdminEJBLocal instance = (AdminEJBLocal) getEJBInstance(AdminEJB.class.getSimpleName());
+            AdministratorEJBLocal instance = (AdministratorEJBLocal) getEJBInstance(AdministratorEJB.class.getSimpleName());
             tx.begin();
             // Get user
             User user = instance.getUser(USER_NAME);

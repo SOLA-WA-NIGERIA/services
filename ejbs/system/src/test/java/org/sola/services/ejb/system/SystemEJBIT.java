@@ -41,13 +41,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sola.services.common.test.AbstractEJBTest;
-import org.sola.services.ejb.system.businesslogic.SystemEJB;
-import org.sola.services.ejb.system.businesslogic.SystemEJBLocal;
-import org.sola.services.ejb.system.repository.entities.Br;
-import org.sola.services.ejb.system.repository.entities.BrValidation;
+import org.sola.admin.services.ejb.system.businesslogic.SystemAdminEJB;
+import org.sola.admin.services.ejb.system.businesslogic.SystemAdminEJBLocal;
+import org.sola.admin.services.ejb.system.repository.entities.Br;
+import org.sola.admin.services.ejb.system.repository.entities.BrValidation;
 import static org.junit.Assert.*;
 import org.sola.services.common.EntityAction;
-import org.sola.services.ejb.system.repository.entities.EmailTask;
+import org.sola.admin.services.ejb.system.repository.entities.EmailTask;
 
 /**
  *
@@ -75,7 +75,7 @@ public class SystemEJBIT extends AbstractEJBTest {
     @Test
     @Ignore
     public void testEmailTasks() throws Exception {
-        SystemEJBLocal instance = (SystemEJBLocal) getEJBInstance(SystemEJB.class.getSimpleName());
+        SystemAdminEJBLocal instance = (SystemAdminEJBLocal) getEJBInstance(SystemAdminEJB.class.getSimpleName());
         // Create new email task
         EmailTask t = new EmailTask();
         UserTransaction tx = getUserTransaction();
@@ -138,7 +138,7 @@ public class SystemEJBIT extends AbstractEJBTest {
     @Test
     @Ignore
     public void getBr() throws Exception {
-        SystemEJBLocal instance = (SystemEJBLocal) getEJBInstance(SystemEJB.class.getSimpleName());
+        SystemAdminEJBLocal instance = (SystemAdminEJBLocal) getEJBInstance(SystemAdminEJB.class.getSimpleName());
         Br br = instance.getBr("app-shares-total-check", null);
         assertNotNull("Can't find Business Rule \"app-shares-total-check\"", br);
         System.out.println(">>> Found business rule with feedback \"" + br.getFeedback() + "\"");
@@ -150,7 +150,7 @@ public class SystemEJBIT extends AbstractEJBTest {
         UserTransaction tx = getUserTransaction();
         try {
             tx.begin();
-            SystemEJBLocal instance = (SystemEJBLocal) getEJBInstance(SystemEJB.class.getSimpleName());
+            SystemAdminEJBLocal instance = (SystemAdminEJBLocal) getEJBInstance(SystemAdminEJB.class.getSimpleName());
             Br br = instance.getBr("app-shares-total-check", null);
             assertNotNull("Can't find Business Rule \"app-shares-total-check\"", br);
             System.out.println(">>> Found business rule with feedback \"" + br.getFeedback() + "\"");
