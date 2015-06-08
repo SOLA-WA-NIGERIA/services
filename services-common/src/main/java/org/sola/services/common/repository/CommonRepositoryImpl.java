@@ -45,7 +45,14 @@ import org.sola.services.common.EntityAction;
 import org.sola.services.common.LocalInfo;
 import org.sola.services.common.ejbs.AbstractEJBLocal;
 import org.sola.services.common.faults.FaultUtility;
-import org.sola.services.common.repository.entities.*;
+import org.sola.services.common.repository.entities.AbstractCodeEntity;
+import org.sola.services.common.repository.entities.AbstractEntity;
+import org.sola.services.common.repository.entities.AbstractEntityInfo;
+import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
+import org.sola.services.common.repository.entities.AbstractVersionedEntity;
+import org.sola.services.common.repository.entities.ChildEntityInfo;
+import org.sola.services.common.repository.entities.ColumnInfo;
+import org.sola.services.ejb.cache.businesslogic.CacheEJBLocal;
 
 /**
  * Implementation of the {@linkplain CommonRepository} interface that uses the
@@ -61,6 +68,7 @@ public class CommonRepositoryImpl implements CommonRepository {
      */
     private static final String LOAD_INHIBITORS = "Repository.loadInhibitors";
     private DatabaseConnectionManager dbConnectionManager = null;
+    CacheEJBLocal cache;
 
     /**
      * Loads the myBatis configuration file and initializes a connection to the
@@ -87,6 +95,18 @@ public class CommonRepositoryImpl implements CommonRepository {
     @Override
     public DatabaseConnectionManager getDbConnectionManager() {
         return dbConnectionManager;
+    }
+
+    /**
+     * Retrieves the EJB cache used by the repository.
+     *
+     * @return
+     */
+    public CacheEJBLocal getCache() {
+        if (cache == null) {
+            cache = RepositoryUtility.getEJB(CacheEJBLocal.class);
+        }
+        return cache;
     }
 
     /**
@@ -263,32 +283,6 @@ public class CommonRepositoryImpl implements CommonRepository {
     }
 
     /**
-     * Updates the redactCode for the entity to represent the
-     * minRedactClassification for a column if no override redact code has been
-     * set on the entity.
-     *
-     * @param <T>
-     * @param entity The entity being processed
-     * @param columnInfo The column to validate
-     * @param overrideRedactCode The override redact code set on the entity
-     */
-    private <T extends AbstractReadOnlyEntity> void setEntityRedactCode(T entity,
-            AbstractEntityInfo columnInfo, String overrideRedactCode) {
-        if (StringUtility.isEmpty(overrideRedactCode)
-                && !StringUtility.isEmpty(columnInfo.getMinRedactClassification())) {
-            // The column has a minRedactClassification. Set the classification on 
-            // this column as the redact code for the entity. Note that a higher 
-            // minRedactClassification may have already been assigned to the entity, 
-            // so check for that case as well.
-            if (StringUtility.isEmpty(entity.getRedactCode())
-                    || columnInfo.getMinRedactClassification().compareTo(entity.getRedactCode()) > 0) {;
-                entity.setEntityFieldValue(entity.getColumnInfo(AbstractReadOnlyEntity.REDACT_CODE_COLUMN_NAME),
-                        columnInfo.getMinRedactClassification());
-            }
-        }
-    }
-
-    /**
      * Processes a row of the the generic result set returned from Mybatis after
      * executing an SQL query. Each column of the result is mapped to the entity
      * field based on the name of the column specified in the
@@ -327,6 +321,32 @@ public class CommonRepositoryImpl implements CommonRepository {
             }
         }
         return entity;
+    }
+
+    /**
+     * Updates the redactCode for the entity to represent the
+     * minRedactClassification for a column if no override redact code has been
+     * set on the entity.
+     *
+     * @param <T>
+     * @param entity The entity being processed
+     * @param columnInfo The column to validate
+     * @param overrideRedactCode The override redact code set on the entity
+     */
+    private <T extends AbstractReadOnlyEntity> void setEntityRedactCode(T entity,
+            AbstractEntityInfo columnInfo, String overrideRedactCode) {
+        if (StringUtility.isEmpty(overrideRedactCode)
+                && !StringUtility.isEmpty(columnInfo.getMinRedactClassification())) {
+            // The column has a minRedactClassification. Set the classification on 
+            // this column as the redact code for the entity. Note that a higher 
+            // minRedactClassification may have already been assigned to the entity, 
+            // so check for that case as well.
+            if (StringUtility.isEmpty(entity.getRedactCode())
+                    || columnInfo.getMinRedactClassification().compareTo(entity.getRedactCode()) > 0) {;
+                entity.setEntityFieldValue(entity.getColumnInfo(AbstractReadOnlyEntity.REDACT_CODE_COLUMN_NAME),
+                        columnInfo.getMinRedactClassification());
+            }
+        }
     }
 
     /**
@@ -930,6 +950,11 @@ public class CommonRepositoryImpl implements CommonRepository {
         if (entity != null) {
             SqlSession session = getSqlSession();
             try {
+                if (entity.isCacheable()) {
+                    // Check if the entity is cacheable before saving as the
+                    // entity can be null after the save due to deletion. 
+                    getCache().clearEntityLists(entity.getClass());
+                }
                 entity = saveEntity(entity, getMapper(session));
             } finally {
                 session.close();
@@ -1203,13 +1228,26 @@ public class CommonRepositoryImpl implements CommonRepository {
 
         }
 
+        // Determine the cache key
+        String key = null;
+        if (RepositoryUtility.isCachable(entityClass)) {
+            key = getCache().getKey(entityClass,
+                    (String) params.get(CommonSqlProvider.PARAM_LANGUAGE_CODE));
+        }
+
         List<T> entityList = null;
-        
-        SqlSession session = getSqlSession();
-        try {
-            entityList = getEntityList(entityClass, params, getMapper(session));
-        } finally {
-            session.close();
+        if (!StringUtility.isEmpty(key) && getCache().isCachedList(key)) {
+            entityList = getCache().getList(entityClass, key);
+        } else {
+            SqlSession session = getSqlSession();
+            try {
+                entityList = getEntityList(entityClass, params, getMapper(session));
+            } finally {
+                session.close();
+            }
+            if (RepositoryUtility.isCachable(entityClass)) {
+                getCache().putList(key, entityList);
+            }
         }
         return entityList;
     }

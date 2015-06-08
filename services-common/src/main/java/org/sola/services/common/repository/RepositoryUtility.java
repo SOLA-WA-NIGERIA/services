@@ -27,10 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.sola.services.common.repository;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,9 +34,13 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.Cacheable;
@@ -56,13 +56,18 @@ import org.sola.common.logging.LogUtility;
 import org.sola.common.messaging.MessageUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.LocalInfo;
-import org.sola.services.common.ejbs.AbstractEJBLocal;
 import org.sola.services.common.repository.entities.AbstractEntityInfo;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 import org.sola.services.common.repository.entities.ChildEntityInfo;
 import org.sola.services.common.repository.entities.ColumnInfo;
+import org.sola.services.ejb.cache.businesslogic.CacheEJBLocal;
 
 /**
+ * Repository Utility class providing a number of utility methods for dealing
+ * with entities, database repositories and accessing EJBs.
+ *
+ * This class stores a cache of the metadata for each entity to limit avoid
+ * excessive reflection over entity classes during each database operation.
  *
  * @author soladev
  */
@@ -74,7 +79,17 @@ public class RepositoryUtility {
     private static Map<String, Boolean> entityCacheable = new HashMap<String, Boolean>();
     private static Map<String, String> sorterExpressions = new HashMap<String, String>();
     private static Map<String, List<ChildEntityInfo>> childEntities = new HashMap<String, List<ChildEntityInfo>>();
+    private static Boolean isCacheEJBDeployed = null;
 
+    /**
+     * Uses recursion to obtain the list of all declared fields of a class
+     * including those fields declared on ancestor classes
+     *
+     * @param c The class to assess
+     * @param fields The list of declared fields for the class and all its super
+     * classes. Note that this parameter must be an empty list. The list is
+     * populated by the recursive function.
+     */
     public static void getAllFields(Class<?> c, List<Field> fields) {
         fields.addAll(Arrays.asList(c.getDeclaredFields()));
         Class<?> superClass = c.getSuperclass();
@@ -95,6 +110,46 @@ public class RepositoryUtility {
             }
         }
         return tableName;
+    }
+
+    /**
+     * Indicates if an entity can be cached for fast access. Used for reference
+     * codes that are not frequently updated.
+     *
+     * @param <T>
+     * @param entityClass The entity class to check for the cacheable annotation
+     * @return true if the Cacheable Annotation value is true, false otherwise.
+     */
+    public static <T extends AbstractReadOnlyEntity> boolean isCachable(Class<T> entityClass) {
+        boolean result = false;
+
+        if (isCacheEJBDeployed == null) {
+            // Check if the CacheEJB has been deployed or not
+            isCacheEJBDeployed = RepositoryUtility.tryGetEJB("CacheEJBLocal") != null;
+            LogUtility.log("isCacheEJBDeployed = " + isCacheEJBDeployed);
+        }
+        if (isCacheEJBDeployed) {
+            if (entityCacheable.containsKey(entityClass.getName())) {
+                result = entityCacheable.get(entityClass.getName());
+            } else {
+                Cacheable cacheableAnnotation = entityClass.getAnnotation(Cacheable.class);
+                if (cacheableAnnotation == null && entityClass.getSuperclass() != null
+                        && AbstractReadOnlyEntity.class.isAssignableFrom(entityClass.getSuperclass())) {
+                    result = isCachable((Class<AbstractReadOnlyEntity>) entityClass.getSuperclass());
+                }
+                if (cacheableAnnotation != null) {
+                    result = cacheableAnnotation.value();
+                    // Set the cacheable state of the entity based on the value of the
+                    // Cacheable annotation
+                    entityCacheable.put(entityClass.getName(), result);
+                } else {
+                    // Set the cacheable state for this entity. Note that the result 
+                    // may hve been inherited from a super class. 
+                    entityCacheable.put(entityClass.getName(), result);
+                }
+            }
+        }
+        return result;
     }
 
     public static <T extends AbstractReadOnlyEntity> String getSorterExpression(Class<T> entityClass) {
@@ -138,6 +193,16 @@ public class RepositoryUtility {
                         columnInfo.setOnSelectFunction(accessFunctions.onSelect());
                         columnInfo.setOnChangeFunction(accessFunctions.onChange());
                     }
+                    Redact redactInfo = field.getAnnotation(Redact.class);
+                    if (redactInfo != null) {
+                        columnInfo.setRedact(true);
+                        columnInfo.setMinRedactClassification(
+                                StringUtility.isEmpty(redactInfo.minClassification()) ? null
+                                : redactInfo.minClassification());
+                        columnInfo.setRedactMessageCode(
+                                StringUtility.isEmpty(redactInfo.messageCode()) ? null
+                                : redactInfo.messageCode());
+                    }
                     columns.add(columnInfo);
                 }
             }
@@ -146,12 +211,30 @@ public class RepositoryUtility {
         return columns;
     }
 
+    /**
+     * Retrieves the column info metadata from an entity class based on a field
+     * name or database column name.
+     *
+     * @param <T>
+     * @param entityClass The class of entity to retrieve the column info from
+     * @param fieldNameOrDbColName The name of the entity field or the name of
+     * the database column
+     * @return The ColumnInfo metadata if a matching field is found, otherwise
+     * null.
+     */
     public static <T extends AbstractReadOnlyEntity> ColumnInfo getColumnInfo(Class<T> entityClass,
-            String fieldName) {
+            String fieldNameOrDbColName) {
         ColumnInfo result = null;
-        if (fieldName != null) {
+        if (fieldNameOrDbColName != null) {
             for (ColumnInfo columnInfo : getColumns(entityClass)) {
-                if (columnInfo.getFieldName().equalsIgnoreCase(fieldName)) {
+                if (columnInfo.getFieldName().equalsIgnoreCase(fieldNameOrDbColName)) {
+                    // Check the entity field name
+                    result = columnInfo;
+                    break;
+                }
+                if (columnInfo.getColumnName() != null
+                        && columnInfo.getColumnName().equalsIgnoreCase(fieldNameOrDbColName)) {
+                    // Check the database column name
                     result = columnInfo;
                     break;
                 }
@@ -222,6 +305,7 @@ public class RepositoryUtility {
                 ChildEntity childAnnotation = field.getAnnotation(ChildEntity.class);
                 ChildEntityList childListAnnotation = field.getAnnotation(ChildEntityList.class);
                 ExternalEJB externalEJBAnnoation = field.getAnnotation(ExternalEJB.class);
+                Redact redactInfo = field.getAnnotation(Redact.class);
                 ParameterizedType paramType = null;
                 if (Iterable.class.isAssignableFrom(field.getType())) {
                     paramType = (ParameterizedType) field.getGenericType();
@@ -253,6 +337,14 @@ public class RepositoryUtility {
                     childInfo.setEJBLocalClass(externalEJBAnnoation.ejbLocalClass());
                     childInfo.setLoadMethod(externalEJBAnnoation.loadMethod());
                     childInfo.setSaveMethod(externalEJBAnnoation.saveMethod());
+                }
+                if (redactInfo != null && childInfo != null) {
+                    // Capture redact details but ignore the messageCode as this does not
+                    // apply to List or child entity fields
+                    childInfo.setRedact(true);
+                    childInfo.setMinRedactClassification(
+                            StringUtility.isEmpty(redactInfo.minClassification()) ? null
+                            : redactInfo.minClassification());
                 }
                 if (childInfo != null) {
                     children.add(childInfo);
@@ -291,41 +383,19 @@ public class RepositoryUtility {
         return ejb;
     }
 
-//    public static <T extends AbstractEJBLocal> T getEJB(Class<T> ejbLocalClass) {
-//        T ejb = null;
-//
-//        String ejbLookupName = "";
-//        
-//        try {
-//            InitialContext ic = new InitialContext();
-//            
-//            //String moduleName = (String) ic.lookup("java:module/ModuleName");
-//            //String appName = (String) ic.lookup("java:app/AppName");
-//            
-//            ejbLookupName = "java:app/" + ejbLocalClass.getSimpleName();
-//            ejb = (T) ic.lookup(ejbLookupName);
-//        } catch (NamingException ex) {
-//            throw new SOLAException(ServiceMessage.GENERAL_UNEXPECTED,
-//                    // Capture the specific details so they are added to the log
-//                    new Object[]{"Unable to locate EJB " + ejbLookupName, ex});
-//        }
-//        return ejb;
-//    }
-//
-//    public static <T extends AbstractEJBLocal> T tryGetEJB(Class<T> ejbLocalClass) {
-//        T ejb = null;
-//
-//        String ejbLookupName = "";
-//        try {
-//            InitialContext ic = new InitialContext();
-//            
-//            ejbLookupName = "java:app/" + ejbLocalClass.getSimpleName();
-//            ejb = (T) ic.lookup(ejbLookupName);
-//        } catch (NamingException ex) {
-//            // Ignore the naming exception and return null; 
-//        }
-//        return ejb;
-//    }
+    public static <T> T tryGetEJB(String ejbLocalClass) {
+        T ejb = null;
+
+        String ejbLookupName = "java:app/" + ejbLocalClass;
+        try {
+            InitialContext ic = new InitialContext();
+            ejb = (T) ic.lookup(ejbLookupName);
+        } catch (NamingException ex) {
+            // Ignore the naming exception and return null; 
+        }
+        return ejb;
+    }
+
     /**
      * Issue #192 Compare two arrays to determine if they are equal or not.
      * Performs a deep comparison of all array members using the Arrays.equal
@@ -428,38 +498,6 @@ public class RepositoryUtility {
             // AbstractEJB otherwise it will be ignored by the isInRole check. 
             result = LocalInfo.isInRole(classificationCode,
                     RolesConstants.CLASSIFICATION_TOPSECRET);
-        }
-        return result;
-    }
-
-    /**
-     * Indicates if an entity can be cached for fast access. Used for reference
-     * codes that are not frequently updated.
-     *
-     * @param <T>
-     * @param entityClass The entity class to check for the cacheable annotation
-     * @return true if the Cacheable Annotation value is true, false otherwise.
-     */
-    public static <T extends AbstractReadOnlyEntity> boolean isCachable(Class<T> entityClass) {
-        boolean result = false;
-        if (entityCacheable.containsKey(entityClass.getName())) {
-            result = entityCacheable.get(entityClass.getName());
-        } else {
-            Cacheable cacheableAnnotation = entityClass.getAnnotation(Cacheable.class);
-            if (cacheableAnnotation == null && entityClass.getSuperclass() != null
-                    && AbstractReadOnlyEntity.class.isAssignableFrom(entityClass.getSuperclass())) {
-                result = isCachable((Class<AbstractReadOnlyEntity>) entityClass.getSuperclass());
-            }
-            if (cacheableAnnotation != null) {
-                result = cacheableAnnotation.value();
-                // Set the cacheable state of the entity based on the value of the
-                // Cacheable annotation
-                entityCacheable.put(entityClass.getName(), result);
-            } else {
-                // Set the cacheable state for this entity. Note that the result 
-                // may hve been inherited from a super class. 
-                entityCacheable.put(entityClass.getName(), result);
-            }
         }
         return result;
     }

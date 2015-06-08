@@ -74,6 +74,7 @@ import org.sola.services.common.repository.entities.AbstractEntity;
     RolesConstants.ADMINISTRATIVE_BA_UNIT_SAVE,
     RolesConstants.ADMINISTRATIVE_BA_UNIT_PRINT_CERT,
     RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH,
+    RolesConstants.ADMINISTRATIVE_NOTATION_SAVE,
     RolesConstants.SOURCE_TRANSACTIONAL,
     RolesConstants.SOURCE_SAVE,
     RolesConstants.SOURCE_SEARCH,
@@ -90,6 +91,7 @@ import org.sola.services.common.repository.entities.AbstractEntity;
     RolesConstants.ADMINISTRATIVE_SYSTEMATIC_REGISTRATION,
     RolesConstants.ADMIN_CHANGE_PASSWORD,
     RolesConstants.CS_ACCESS_CS,
+    RolesConstants.ADMINISTRATIVE_ASSIGN_TEAM,
     RolesConstants.CS_MODERATE_CLAIM,
     RolesConstants.CS_RECORD_CLAIM,
     RolesConstants.CS_REVIEW_CLAIM,
@@ -99,7 +101,12 @@ import org.sola.services.common.repository.entities.AbstractEntity;
     RolesConstants.CLASSIFICATION_CONFIDENTIAL,
     RolesConstants.CLASSIFICATION_SECRET,
     RolesConstants.CLASSIFICATION_TOPSECRET,
-    RolesConstants.CLASSIFICATION_SUPPRESSION_ORDER
+    RolesConstants.CLASSIFICATION_SUPPRESSION_ORDER,
+    RolesConstants.SERVICE_START_CHECKLIST,
+    RolesConstants.SERVICE_START_PUBLIC_DISPLAY,
+    RolesConstants.SERVICE_START_OBJECTIONS,
+    RolesConstants.SERVICE_START_NOTIFY,
+    RolesConstants.SERVICE_START_NEGOTIATE
 })
 public abstract class AbstractEJB implements AbstractEJBLocal {
 
@@ -305,6 +312,19 @@ public abstract class AbstractEJB implements AbstractEJBLocal {
 
     @Override
     public <T extends AbstractEntity> T saveEntity(T entityObject) {
-        return this.getRepository().saveEntity(entityObject);
+        T result = null;
+        if (entityObject != null) {
+            result = this.getRepository().saveEntity(entityObject);
+        }
+        return result;
+    }
+
+    @Override
+    public <T extends AbstractEntity> T getEntityById(Class<T> entityClass, String id) {
+        T result = null;
+        if (entityClass != null && id != null) {
+            result = this.getRepository().getEntity(entityClass, id);
+        }
+        return result;
     }
 }
