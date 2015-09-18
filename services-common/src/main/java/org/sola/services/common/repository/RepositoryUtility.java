@@ -60,7 +60,6 @@ import org.sola.services.common.repository.entities.AbstractEntityInfo;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 import org.sola.services.common.repository.entities.ChildEntityInfo;
 import org.sola.services.common.repository.entities.ColumnInfo;
-import org.sola.services.ejb.cache.businesslogic.CacheEJBLocal;
 
 /**
  * Repository Utility class providing a number of utility methods for dealing

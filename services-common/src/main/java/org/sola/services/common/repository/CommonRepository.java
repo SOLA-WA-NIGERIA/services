@@ -39,7 +39,7 @@ import org.sola.services.common.repository.entities.AbstractCodeEntity;
 import org.sola.services.common.repository.entities.AbstractEntity;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 import org.sola.services.common.repository.entities.ChildEntityInfo;
-import org.sola.services.ejb.cache.businesslogic.CacheEJBLocal;
+import org.sola.admin.services.ejb.cache.businesslogic.CacheAdminEJBLocal; 
 
 /**
  *
@@ -110,5 +110,5 @@ public interface CommonRepository {
 
     int bulkUpdate(Map params);
 
-    CacheEJBLocal getCache();
+    CacheAdminEJBLocal getCache();
 }

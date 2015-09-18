@@ -27,9 +27,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.sola.services</groupId>
-            <artifactId>sola-cache</artifactId>
-            <version>1503a</version>
+            <groupId>org.fao.sola.admin.services.ejbs</groupId>
+            <artifactId>sola-admin-cache</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fao.sola.admin.common</groupId>

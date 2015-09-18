@@ -52,7 +52,7 @@ import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 import org.sola.services.common.repository.entities.AbstractVersionedEntity;
 import org.sola.services.common.repository.entities.ChildEntityInfo;
 import org.sola.services.common.repository.entities.ColumnInfo;
-import org.sola.services.ejb.cache.businesslogic.CacheEJBLocal;
+import org.sola.admin.services.ejb.cache.businesslogic.CacheAdminEJBLocal; 
 
 /**
  * Implementation of the {@linkplain CommonRepository} interface that uses the
@@ -68,7 +68,7 @@ public class CommonRepositoryImpl implements CommonRepository {
      */
     private static final String LOAD_INHIBITORS = "Repository.loadInhibitors";
     private DatabaseConnectionManager dbConnectionManager = null;
-    CacheEJBLocal cache;
+    CacheAdminEJBLocal cache;
 
     /**
      * Loads the myBatis configuration file and initializes a connection to the
@@ -102,9 +102,10 @@ public class CommonRepositoryImpl implements CommonRepository {
      *
      * @return
      */
-    public CacheEJBLocal getCache() {
+    @Override
+    public CacheAdminEJBLocal getCache() {
         if (cache == null) {
-            cache = RepositoryUtility.getEJB(CacheEJBLocal.class);
+            //cache = RepositoryUtility.getEJB(CacheEJBAdminLocal.class);
         }
         return cache;
     }
