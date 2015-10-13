@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>sola-admin-services</artifactId>
-        <groupId>org.fao.sola.admin</groupId>
-        <version>1504a</version>
+        <groupId>org.nga.sola.admin</groupId>
+        <version>1510a</version>
     </parent>
 
-    <groupId>org.fao.sola.admin.services</groupId>
+    <groupId>org.nga.sola.admin.services</groupId>
     <artifactId>sola-admin-services-common</artifactId>
-    <version>1504a</version>
+    <version>1510a</version>
     <packaging>jar</packaging>
 
     <name>Services Admin Common</name>
@@ -22,17 +22,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.fao.sola.admin.common</groupId>
+            <groupId>org.nga.sola.admin.common</groupId>
             <artifactId>sola-admin-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.fao.sola.admin.services.ejbs</groupId>
+            <groupId>org.nga.sola.admin.services.ejbs</groupId>
             <artifactId>sola-admin-cache</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.fao.sola.admin.common</groupId>
+            <groupId>org.nga.sola.admin.common</groupId>
             <artifactId>sola-admin-messaging</artifactId>
             <version>${project.version}</version>
         </dependency>

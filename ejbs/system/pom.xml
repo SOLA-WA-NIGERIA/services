@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>sola-admin-ejbs</artifactId>
-        <groupId>org.fao.sola.admin.services</groupId>
-        <version>1504a</version>
+        <groupId>org.nga.sola.admin.services</groupId>
+        <version>1510a</version>
     </parent>
-    <groupId>org.fao.sola.admin.services.ejbs</groupId>
+    <groupId>org.nga.sola.admin.services.ejbs</groupId>
     <artifactId>sola-admin-system</artifactId>
-    <version>1504a</version>
+    <version>1510a</version>
     <packaging>ejb</packaging>
     <name>EJB Admin System</name>
     <repositories>

@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>sola-admin-services</artifactId>
-        <groupId>org.fao.sola.admin</groupId>
-        <version>1504a</version>
+        <groupId>org.nga.sola.admin</groupId>
+        <version>1510a</version>
     </parent>
-    <groupId>org.fao.sola.admin.services</groupId>
+    <groupId>org.nga.sola.admin.services</groupId>
     <artifactId>sola-admin-ejbs</artifactId>
     <packaging>pom</packaging>
-    <version>1504a</version>
+    <version>1510a</version>
     <name>EJB Admin POM</name>
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -24,10 +24,11 @@
         <module>claim</module>
         <module>system</module>
         <module>search</module>
+        <module>ejb-cache</module>
     </modules>
     <dependencies>
         <dependency>
-            <groupId>org.fao.sola.admin.services</groupId>
+            <groupId>org.nga.sola.admin.services</groupId>
             <artifactId>sola-admin-test-common</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -39,7 +40,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.fao.sola.admin.services</groupId>
+            <groupId>org.nga.sola.admin.services</groupId>
             <artifactId>sola-admin-services-common</artifactId>
             <version>${project.version}</version>
         </dependency>
