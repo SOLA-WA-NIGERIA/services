@@ -24,7 +24,6 @@
         <module>claim</module>
         <module>system</module>
         <module>search</module>
-        <module>ejb-cache</module>
     </modules>
     <dependencies>
         <dependency>

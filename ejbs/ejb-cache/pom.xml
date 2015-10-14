@@ -2,9 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>sola-admin-ejbs</artifactId>
-        <groupId>org.nga.sola.admin.services</groupId>
+        <artifactId>sola-admin-services</artifactId>
+        <groupId>org.nga.sola.admin</groupId>
         <version>1510a</version>
+        <relativePath></relativePath>
     </parent>
 
     <groupId>org.nga.sola.admin.services.ejbs</groupId>
@@ -15,8 +16,7 @@
     <name>EJB Admin Cache</name>
     
     <dependencies>
-       
-        <dependency>
+         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>6.0</version>
