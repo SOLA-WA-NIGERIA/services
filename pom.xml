@@ -15,15 +15,11 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     </properties>
     <modules>
-        <!-- Common Projects -->
-        <module>../common/common</module>
         <module>../common/messaging</module>
-        <!-- Service Utility Projects -->
+        <module>../common/common</module>
+        <module>cache</module>
         <module>services-common</module>
-        <!-- EJB Projects -->
         <module>ejbs</module>
-        <module>ejbs/ejb-cache</module>
-        <!-- Test Projects -->
         <module>test-common</module>
     </modules>
 </project>

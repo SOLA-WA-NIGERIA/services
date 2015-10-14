@@ -27,7 +27,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.nga.sola.admin.services.ejbs</groupId>
+            <groupId>org.nga.sola.admin.services</groupId>
             <artifactId>sola-admin-cache</artifactId>
             <version>${project.version}</version>
         </dependency>
