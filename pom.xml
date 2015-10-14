@@ -22,7 +22,6 @@
         <module>services-common</module>
         <!-- EJB Projects -->
         <module>ejbs</module>
-        <module>ejbs/ejb-cache</module>
         <!-- Test Projects -->
         <module>test-common</module>
     </modules>
