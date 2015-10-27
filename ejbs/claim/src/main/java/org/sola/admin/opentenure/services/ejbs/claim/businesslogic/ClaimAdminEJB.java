@@ -9,6 +9,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.sola.common.RolesConstants;
 import org.sola.admin.opentenure.services.ejbs.claim.entities.ClaimStatus;
+import org.sola.admin.opentenure.services.ejbs.claim.entities.ClaimStatusChanger;
 import org.sola.admin.opentenure.services.ejbs.claim.entities.FieldConstraintType;
 import org.sola.admin.opentenure.services.ejbs.claim.entities.FieldType;
 import org.sola.admin.opentenure.services.ejbs.claim.entities.FieldValueType;
@@ -17,6 +18,7 @@ import org.sola.services.common.ejbs.AbstractEJB;
 import org.sola.services.common.repository.CommonSqlProvider;
 import org.sola.admin.services.ejb.system.businesslogic.SystemAdminEJBLocal;
 import org.sola.admin.services.ejbs.admin.businesslogic.AdministratorEJBLocal;
+import org.sola.services.common.EntityAction;
 
 /**
  * Implements methods to manage the claim and it's related objects
@@ -141,5 +143,14 @@ public class ClaimAdminEJB extends AbstractEJB implements ClaimAdminEJBLocal {
     @RolesAllowed({RolesConstants.ADMIN_MANAGE_SETTINGS})
     public FormTemplate saveFormTemplate(FormTemplate form) {
         return getRepository().saveEntity(form);
+    }
+
+    @Override
+    @RolesAllowed({RolesConstants.ADMIN_MANAGE_SETTINGS})
+    public boolean changeClaimStatus(String claimId, String statusCode) {
+        ClaimStatusChanger statusChanger = getRepository().getEntity(ClaimStatusChanger.class, claimId);
+        statusChanger.setStatusCode(statusCode);
+        getRepository().saveEntity(statusChanger);
+        return true;
     }
 }
