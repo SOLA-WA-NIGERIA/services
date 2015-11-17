@@ -21,5 +21,6 @@ public interface ClaimAdminEJBLocal extends AbstractEJBLocal {
     List<FieldConstraintType> getFieldConstraintTypes(String languageCode);
     boolean checkFormTemplateHasPayload(String formName);
     FormTemplate saveFormTemplate(FormTemplate form);
+    boolean makeFormDefault(String formName);
     boolean changeClaimStatus(String claimId, String statusCode);
 }
