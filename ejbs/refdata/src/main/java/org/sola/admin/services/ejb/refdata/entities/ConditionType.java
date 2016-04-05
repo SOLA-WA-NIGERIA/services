@@ -27,6 +27,7 @@
  */
 package org.sola.admin.services.ejb.refdata.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Table;
 import org.sola.services.common.repository.DefaultSorter;
 import org.sola.services.common.repository.entities.AbstractCodeEntity;
@@ -34,6 +35,17 @@ import org.sola.services.common.repository.entities.AbstractCodeEntity;
 @Table(name = "condition_type", schema = "administrative")
 @DefaultSorter(sortString="display_value")
 public class ConditionType extends AbstractCodeEntity {
+ @Column(name = "is_for")
+ private String isFor;
+
+    public String getIsFor() {
+        return isFor;
+    }
+
+    public void setIsFor(String isFor) {
+        this.isFor = isFor;
+    }
+    
     public ConditionType(){
         super();
     }
