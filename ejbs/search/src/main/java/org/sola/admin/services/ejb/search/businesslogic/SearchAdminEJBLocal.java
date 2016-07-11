@@ -36,6 +36,7 @@ import org.sola.admin.services.ejb.search.repository.entities.UserSearchResult;
 import java.util.HashMap;
 import java.util.List;
 import javax.ejb.Local;
+import org.sola.admin.services.ejb.search.repository.entities.LeaseConditionTemplateSearchResults;
 import org.sola.services.common.ejbs.AbstractEJBLocal;
 
 /**
@@ -78,4 +79,12 @@ public interface SearchAdminEJBLocal extends AbstractEJBLocal {
      * SearchEJB.searchBr}.
      */
     List<BrSearchResult> searchBr(BrSearchParams searchParams, String lang);
+
+    /** 
+     * Returns list of lease condition templates filtered by RRR type
+     * @param lang Language code
+     * @param rrrType RRR type code for filtering lease condition templates
+     * @return 
+     */
+    List<LeaseConditionTemplateSearchResults> getLeaseConditionTemplates(String lang, String rrrType);
 }

@@ -40,6 +40,7 @@ import java.util.*;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.sola.admin.services.ejb.search.repository.entities.LeaseConditionTemplateSearchResults;
 import org.sola.common.RolesConstants;
 import org.sola.services.common.ejbs.AbstractEJB;
 import org.sola.services.common.repository.CommonSqlProvider;
@@ -205,5 +206,18 @@ public class SearchAdminEJB extends AbstractEJB implements SearchAdminEJBLocal {
         params.put("technicalTypeCode", searchParams.getTechnicalTypeCode());
         params.put("targetCode", searchParams.getTargetCode());
         return getRepository().getEntityList(BrSearchResult.class, params);
+    }
+
+    @Override
+    public List<LeaseConditionTemplateSearchResults> getLeaseConditionTemplates(String lang, String rrrType) {
+        if(lang == null)
+            lang = "en-us";
+        if(rrrType == null)
+            rrrType = "";
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_QUERY, LeaseConditionTemplateSearchResults.SELECT_QUERY);
+        params.put(LeaseConditionTemplateSearchResults.PARAM_LANG, lang);
+        params.put(LeaseConditionTemplateSearchResults.PARAM_RRR_TYPE, rrrType);
+        return getRepository().getEntityList(LeaseConditionTemplateSearchResults.class, params);
     }
 }
